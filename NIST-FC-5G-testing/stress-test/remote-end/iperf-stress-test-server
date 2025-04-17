@@ -1,0 +1,72 @@
+#! /bin/bash
+
+# Stress test iPerf server
+# Set the iperf UDP server2 of HD video stream with default port 5001, and record the log with 1 second interval to logfile
+
+output_file_name_suffix=""
+output_location="/home/jing/5G-testing/NIST-FC-test-planning/stress-test/logs"
+server_port="5001"
+
+show_help(){
+  echo "Usage: $0 [-o|--output NAME_SUFFIX] [-h|--help]"
+  echo 
+  echo "Options:"
+  echo " -o, --output NAME_SUFFIX   The suffix add to log output"
+  echo " -h, --help                 Display the help message"
+}
+
+
+## parse option
+#
+# getopt :  -o "options" --long "options" -n "name"
+#   option -> letter alone : take no option
+#          -> letter with colon : require argument 
+#          -> letter with two colon : optional argument
+#
+#
+#
+
+OPTS=$(getopt -o ho: --long help,output: -n 'iperf-stress-test-server' -- "$@")
+
+if [ $? -ne 0 ]; then
+  echo "Fail to parse options"
+  exit1
+fi
+
+## Process option
+
+for OPTS; do
+  case "$1" in
+    -h | --help)
+      show_help
+      exit 0
+      ;;
+    -o | --output)
+      output_file_name_suffix="-$2"
+      shift 2
+      ;;
+    "")
+      break
+      ;;
+    *)
+      exit 1
+      ;;
+  esac
+done 
+
+
+
+
+logfile="iperf-5g-stressTest-server-""$(date "+%Y%m%d-%H-%M-%S")""$output_file_name_suffix"".log"
+
+
+## -P option to limit connected client
+# iperf server (normal) 
+iperf -s -u -i 0.5 -p $server_port -P 1 | tee $output_location/$logfile
+
+# iperf server (with PTP on)
+#iperf -s -u -e -i 0.5 -p $server_port | tee output_location/$logfile
+
+
+
+

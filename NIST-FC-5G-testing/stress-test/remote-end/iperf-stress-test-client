@@ -1,0 +1,109 @@
+#! /bin/bash
+
+# # Stress test iPerf client
+# Set the iperf UDP client of Remote Operation Control stream with server 12.1.1.136(5G)/10.10.2.140(ethernet) port 50001, and record the log with 1 second interval to logfile
+
+destIP=""   # for 5G wireless : 12.1.1.136, for baseline : 10.10.2.140
+output_location="/home/jing/5G-testing/NIST-FC-test-planning/stress-test/logs"
+destport="50001"
+streambps=""
+streamtime=""
+pktlength="100"
+
+
+utput_file_name_suffix=""
+
+show_help(){
+  echo "Usage: $0 [-o|--output NAME_SUFFIX] [-i|--ip SERVER_IP] [-s|--streambps STREAMBPS] [-t|--time TIME] [-h|--help]"
+  echo 
+  echo "Options:"
+  echo " -o, --output       NAME_SUFFIX   The suffix add to log output"
+  echo " -i, --ip           SERVER_IP     The remote server ip"
+  echo " -s, --streambps    STREAMBPS     The traffic stream "
+  echo " -t, --time         TIME          iPerf transmission duration in seconds"
+  echo " -h, --help                       Display the help message"
+}
+
+
+## parse option
+#
+# getopt :  -o "options" --long "options" -n "name"
+#   option -> letter alone : take no option
+#          -> letter with colon : require argument 
+#          -> letter with two colon : optional argument
+#
+#
+#
+
+OPTS=$(getopt -o ho:i:s:t: --long help,output:,ip:,streambps:,time: -n 'iperf-stress-test-client' -- "$@")
+
+if [ $? -ne 0 ]; then
+  echo "Fail to parse options"
+  exit1
+fi
+
+## Process option
+
+for OPTS; do
+  case "$1" in
+    -h | --help)
+      show_help
+      exit 0
+      ;;
+    -o | --output)
+      output_file_name_suffix="-$2"
+      shift 2
+      ;;
+    -i | --ip)
+      destIP="$2"
+      shift 2
+      ;;
+    -s | --streambps)
+      streambps="$2"
+      shift 2
+      ;;
+    -t | --time)
+      streamtime="$2"
+      shift 2
+      ;;
+    "")
+      break
+      ;;
+    *)
+      exit 1
+      ;;
+  esac
+done 
+
+
+
+
+logfile="iperf-5g-stressTest-server-""$(date "+%Y%m%d-%H-%M-%S")""$output_file_name_suffix"".log"
+
+if [ "$destIP" == ""]; then
+  echo "server ip not assigned"
+  exit 1
+fi
+
+if [ "$streambps" == ""]; then
+  echo "traffic stream not assigned"
+  exit 1
+fi
+
+if [ "$streamtime" == ""]; then
+  echo "iPerf stream time not specified"
+  exit 1
+fi
+
+
+# iperf client (normal) 
+iperf -c $destIP -u -i 1 -p $destport -l $pktlength -b $streambps -t $streamtime | tee $output_location/$logfile
+
+# iperf client (with PTP on)
+#iperf -c $destIP -u -i 1 -p $destport -l $pktlength -b $streambps -t $streamtime | tee $output_location/$logfile
+
+
+
+
+
+
