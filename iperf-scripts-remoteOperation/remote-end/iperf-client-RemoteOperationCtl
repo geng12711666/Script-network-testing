@@ -1,0 +1,12 @@
+#! /bin/bash
+
+# Set the iperf UDP client of Remote Operation Control stream with server 12.1.1.130 port 50001, and record the log with 1 second interval to logfile
+
+destIP="12.1.1.130"
+destport="50002"
+streambps="80k"
+streamtime="180"
+pktlength="100"
+logfile="iperf-5g-RemoteOperationCtl-client-""$(date "+%Y%m%d-%H-%M-%S")"".log"
+
+iperf -c $destIP -u -i 1 -p $destport -l $pktlength -b $streambps -t $streamtime | tee logs/$logfile

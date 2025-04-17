@@ -1,0 +1,7 @@
+#! /bin/bash
+
+# Set the iperf UDP server of HD video stream with default port 5001, and record the log with 1 second interval to logfile
+
+logfile="iperf-5g-HDvideo-server-""$(date "+%Y%m%d-%H-%M-%S")"".log"
+
+iperf -s -u -i 1 -p 5001 | tee logs/$logfile

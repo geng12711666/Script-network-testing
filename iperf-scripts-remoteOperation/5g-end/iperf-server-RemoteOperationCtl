@@ -1,0 +1,10 @@
+#! /bin/bash
+
+# Set the udp Remote Operation Control iperf server (record the log with 1 second interval to logfile):
+#   Port : 50001
+#
+
+portnum="50002"
+logfile="iperf-5g-RemoteOperationCtl-server-""$(date "+%Y%m%d-%H-%M-%S")"".log"
+
+iperf -s -u -i 1 -p $portnum | tee logs/$logfile

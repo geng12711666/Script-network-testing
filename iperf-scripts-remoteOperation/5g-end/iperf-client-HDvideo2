@@ -1,0 +1,15 @@
+#! /bin/bash
+
+# Set the iperf client of HDvideo2 stream with default port 5001 (record the log with 1 second interval to logfile) :  
+# 	packet length : UDP default 1470 byte ( Due to 7 bytes UDP header + 20 bytes IP header, to prevent fragmentation of 1500 MTU )
+# 	Date rate : 6Mbps
+
+serverip="10.10.0.142"
+serverport="5002"
+streambps="6M"
+#pktlength="1470"
+streamtime="180"
+
+logfile="iperf-5g-HDvideo2-client-""$(date "+%Y%m%d-%H-%M-%S")"".log"
+
+iperf -c $serverip -u -b $streambps -p $serverport -i 1 -t $streamtime | tee logs/$logfile
